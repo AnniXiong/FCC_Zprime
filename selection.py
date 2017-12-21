@@ -15,7 +15,7 @@ class Selection(Analyzer):
         self.counters['cut_flow'].inc('All events')
         
         #select events with at least 2 jets
-        if len(event.jets_50)<2 :
+        if len(event.jets_30)<2 :
             return False
         self.counters['cut_flow'].inc('At least 2 jets')
 

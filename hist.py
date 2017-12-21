@@ -17,7 +17,7 @@ import numpy as np
 #expected_Nevets_3ab = 5.019000E+13                         #|
 #expected_Nevets_10ab = 1.673000E+14                        #|
 # expected number of events actually used by histograms     #|
-expected_Nevets = 5.019000E+13                             
+expected_Nevets = 1.955100E+17                              
 #-----------------------------------------------------------
 
 chain = TChain("events") 
@@ -27,13 +27,13 @@ homedirectory = "/afs/cern.ch/work/a/axiong/public/FCCsoft/heppy/FCChhAnalyses/"
 
 #-------------------------------------------------------------------------
 # Use one of the directories to change different sample                    #|
-#chunkdirectoty = "Zprime_jj/out_0_500/pp_jj012j_5f_HT_0_500_Chunk"        #|
+chunkdirectoty = "Zprime_jj/out1/pp_jj_HT_0_500_Chunk"        #|
 #chunkdirectoty = "Zprime_jj1/out_500_1000/pp_jj012j_5f_HT_500_1000_Chunk"  #|
-chunkdirectoty = "Zprime_jj2/out_1000_2000/pp_jj012j_5f_HT_1000_2000_Chunk"   #|
+#chunkdirectoty = "Zprime_jj2/out_1000_2000/pp_jj012j_5f_HT_0_500_Chunk"   #|
 #-------------------------------------------------------------------------
 
 # ...Zprime_jj... depends on the location of TreeProducer.py used
-rootfile = "/heppy.FCChhAnalyses.Zprime_jj.TreeProducer.TreeProducer_1/tree.root"
+rootfile = "/heppy.FCChhAnalyses.Zprime_jj.TreeProducer2.TreeProducer_1/tree.root"
 
 # Add all files to TChain
 for i in range(5):
@@ -47,10 +47,12 @@ for i in range(5):
 h1d_mjj = TH1F( 'jj_mass', '', 100, 0, 1200)
 h1d_pt1 = TH1F( 'jj_pt1', '', 100, 0, 1200)
 h1d_pt2 = TH1F( 'jj_pt2', '', 100, 0, 1200)
-h1d_eta1 = TH1F( 'jj_eta1', '', 10, -5.0, 5.0 )
-h1d_eta2 = TH1F( 'jj_eta2', '', 10, -5.0, 5.0 )
+h1d_eta1 = TH1F( 'jj_eta1', '', 5, -5.0, 5.0 )
+h1d_eta2 = TH1F( 'jj_eta2', '', 5, -5.0, 5.0 )
 h1d_chi = TH1F( 'jj_chi', '', 20, 0, 30 )
-h1d_delR = TH1F('jj_delR','', 25,0,30)
+h1d_delR = TH1F('jj_delR','', 20,0,30)
+h1d_deleta = TH1F('jj_deleta','',20,0,40)
+h1d_ht = TH1F("Ht",'',100,0,1000)
 
 #mychain = chain.Get( 'events' )
 entries = chain.GetEntries()
@@ -83,28 +85,29 @@ for jentry in xrange(entries):
   
   	#chi = np.exp(2*(np.absolute(jet1_eta-jet2_eta))
   	h1d_chi.Fill( np.exp(2*(np.absolute(chain.jet1_eta-chain.jet2_eta)) )  )
-  
+    	h1d_deleta.Fill( np.absolute(chain.jet1_eta-chain.jet2_eta))
+    	h1d_ht.Fill(chain.Ht)
 
 h1d_mjj.SetTitle("dijet mass distribution")
 h1d_mjj.GetXaxis().SetTitle("mjj (GeV)")
 h1d_mjj.GetYaxis().SetTitle("# of events")
 scale = expected_Nevets/h1d_mjj.Integral()  # normalizing histogram
-h1d_mjj.SetLineColor(7);
-#h1d_mjj.SetFillColor(1)
+#h1d_mjj.SetLineColor(ROOT.kBlack+3);
+h1d_mjj.SetFillColor(1)
 h1d_mjj.Scale(scale)
 
 h1d_chi.SetTitle("angular variable distribution")
 h1d_chi.GetXaxis().SetTitle("chi")
 h1d_chi.GetYaxis().SetTitle("# of events")
 scale = expected_Nevets/h1d_chi.Integral()  # normalizing histogram
-h1d_chi.SetLineColor(7);
+h1d_chi.SetLineColor(1);
 h1d_chi.Scale(scale)
 
 h1d_delR.SetTitle("angular seperation")
 h1d_delR.GetXaxis().SetTitle("del_R")
 h1d_delR.GetYaxis().SetTitle(" # of events")
 scale = expected_Nevets/h1d_delR.Integral()  # normalizing histogram
-h1d_delR.SetLineColor(7);
+h1d_delR.SetLineColor(1);
 h1d_delR.Scale(scale)
 
 # pt plot
@@ -142,6 +145,21 @@ scale = expected_Nevets/h1d_eta2.Integral()  # normalizing histogram
 h1d_eta2.SetLineColor(7);
 h1d_eta2.Scale(scale)
 
+h1d_deleta.SetTitle("rapitity difference")
+h1d_deleta.GetXaxis().SetTitle("eta1-eta2")
+h1d_deleta.GetYaxis().SetTitle("# of events")
+scale = expected_Nevets/h1d_deleta.Integral()  # normalizing histogram
+h1d_deleta.SetLineColor(7);
+h1d_deleta.Scale(scale)
+
+h1d_ht.SetTitle("Jet Pt sum")
+h1d_ht.GetXaxis().SetTitle("eta")
+h1d_ht.GetYaxis().SetTitle("# of events")
+scale = expected_Nevets/h1d_ht.Integral()  # normalizing histogram
+h1d_ht.SetLineColor(7);
+h1d_ht.Scale(scale)
+
+
 
 c2 = TCanvas( "c2","eta", 600, 400 )
 h1d_eta1.Draw()
@@ -150,7 +168,7 @@ c2.Update()
 
 
 # write resulting histogram objects into a root file
-f = TFile("hist_HT_1000_2000.root", "recreate")
+f = TFile("hist_HT_0500.root", "recreate")
 h1d_mjj.Write()
 #h1d_pt1.Write()
 #h1d_pt2.Write()
