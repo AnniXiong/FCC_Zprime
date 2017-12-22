@@ -8,172 +8,110 @@ import numpy as np
 
 #------------------------------------------------------------
 # Expected number of events calculated                      #|
-#expected_Nevets_3ab = 1.955100E+17                         #|
-#expected_Nevets_10ab = 6.517000E+17                        #|
+expected_Nevets_3ab_0_500 = 2.737140E+16                    #|
+#expected_Nevets_10ab = 9.123800E+16                        #|
 # HT_500_1000
-#expected_Nevets_3ab = 4.926000E+14                         #|
-#expected_Nevets_10ab = 1.642000E+15                        #|
+expected_Nevets_3ab_500_1000 = 4.531920E+13                 #|
+#expected_Nevets_10ab = 1.510640E+14                        #|
 #HT_1000_2000
-#expected_Nevets_3ab = 5.019000E+13                         #|
-#expected_Nevets_10ab = 1.673000E+14                        #|
+expected_Nevets_3ab_1000_2000 = 3.513300E+12                #|
+#expected_Nevets_10ab = 1.171100E+13                        #|
 # expected number of events actually used by histograms     #|
-expected_Nevets = 1.955100E+17                              
+#expected_Nevets = 3.513300E+12                             
 #-----------------------------------------------------------
-
-chain = TChain("events") 
-
-#files = glob("/afs/cern.ch/work/a/axiong/public/FCCsoft/heppy/FCChhAnalyses/Zprime_jj/out_0_500/*.root")
-homedirectory = "/afs/cern.ch/work/a/axiong/public/FCCsoft/heppy/FCChhAnalyses/"
 
 #-------------------------------------------------------------------------
 # Use one of the directories to change different sample                    #|
-chunkdirectoty = "Zprime_jj/out1/pp_jj_HT_0_500_Chunk"        #|
-#chunkdirectoty = "Zprime_jj1/out_500_1000/pp_jj012j_5f_HT_500_1000_Chunk"  #|
-#chunkdirectoty = "Zprime_jj2/out_1000_2000/pp_jj012j_5f_HT_0_500_Chunk"   #|
+chunkdirectoty_0_500 = "Zprime_jj/out_0_500/pp_jj_HT_0_500_Chunk"        #|
+chunkdirectoty_500_1000 = "Zprime_jj/out_500_1000/pp_jj_HT_500_1000_Chunk" #|
+chunkdirectoty_1000_2000 = "Zprime_jj/out_1000_2000/pp_jj_HT_1000_2000_Chunk"#|
+#chunkdirectory = "Zprime_sig/out_sig/example"
 #-------------------------------------------------------------------------
 
-# ...Zprime_jj... depends on the location of TreeProducer.py used
-rootfile = "/heppy.FCChhAnalyses.Zprime_jj.TreeProducer2.TreeProducer_1/tree.root"
+def hist(sample,color, output, expected_Nevets):
+	chain = TChain("events") 
 
-# Add all files to TChain
-for i in range(5):
-	filename = homedirectory + chunkdirectoty + str(i) + rootfile
-	file = TFile(filename)
-	chain.AddFile(filename)
-	print ("root file from chunk" + str(i) + " is added")
+	#files = glob("/afs/cern.ch/work/a/axiong/public/FCCsoft/heppy/FCChhAnalyses/Zprime_jj/out_0_500/*.root")
+	homedirectory = "/afs/cern.ch/work/a/axiong/public/FCCsoft/heppy/FCChhAnalyses/"
+	# ...Zprime_jj... depends on the location of TreeProducer.py used, subject to change
+	rootfile = "/heppy.FCChhAnalyses.Zprime_jj.TreeProducer.TreeProducer_1/tree.root"
 
 
-# declare histograms
-h1d_mjj = TH1F( 'jj_mass', '', 100, 0, 1200)
-h1d_pt1 = TH1F( 'jj_pt1', '', 100, 0, 1200)
-h1d_pt2 = TH1F( 'jj_pt2', '', 100, 0, 1200)
-h1d_eta1 = TH1F( 'jj_eta1', '', 5, -5.0, 5.0 )
-h1d_eta2 = TH1F( 'jj_eta2', '', 5, -5.0, 5.0 )
-h1d_chi = TH1F( 'jj_chi', '', 20, 0, 30 )
-h1d_delR = TH1F('jj_delR','', 20,0,30)
-h1d_deleta = TH1F('jj_deleta','',20,0,40)
-h1d_ht = TH1F("Ht",'',100,0,1000)
+	# Add all files to TChain
+	for i in range(5):
+		filename = homedirectory + sample + str(i) + rootfile
+		file = TFile(filename)
+		chain.AddFile(filename)
+		print ("root file from chunk" + str(i) + " is added")
 
-#mychain = chain.Get( 'events' )
-entries = chain.GetEntries()
 
-# Event loop
-for jentry in xrange(entries):
-	ientry = chain.LoadTree(jentry)
-	if ientry < 0:
-		break
-	nb = chain.GetEntry( jentry )
-	if nb <= 0:
-		continue
+	# declare histograms
+	h1d_mjj = TH1F( 'jj_mass', '', 130, 0, 2000)
+	h1d_pt1 = TH1F( 'jj_pt1', '', 130, 0, 1500)
+	h1d_pt2 = TH1F( 'jj_pt2', '', 130, 0, 1000)
+	h1d_eta1 = TH1F( 'jj_eta1', '', 25, -5.0, 5.0 )
+	h1d_eta2 = TH1F( 'jj_eta2', '', 25, -5.0, 5.0 )
+	h1d_chi = TH1F( 'jj_chi', '', 25, 0, 18)
+	h1d_delR = TH1F('jj_delR','', 25,-1,6)
+	h1d_ht = TH1F("ht",'',100,0,3000)
+	h1d_deleta = TH1F('deleta','',20,-4,4)
+	#mychain = chain.Get( 'events' )
+	entries = chain.GetEntries()
+
+	# Event loop
+	for jentry in xrange(entries):
+		ientry = chain.LoadTree(jentry)
+		if ientry < 0:
+			break
+		nb = chain.GetEntry( jentry )
+		if nb <= 0:
+			continue
     
-  	# feed data of two leading jets into TLorentzVector
-  	jet1 = TLorentzVector()
-  	jet1.SetPtEtaPhiE(chain.jet1_pt, chain.jet1_eta, chain.jet1_phi, chain.jet1_e)
-  	jet2 = TLorentzVector()
-  	jet2.SetPtEtaPhiE(chain.jet2_pt, chain.jet2_eta, chain.jet2_phi, chain.jet2_e)
-  	jet12 = jet1 +jet2
+  		# feed data of two leading jets into TLorentzVector
+  		jet1 = TLorentzVector()
+  		jet1.SetPtEtaPhiE(chain.jet1_pt, chain.jet1_eta, chain.jet1_phi, chain.jet1_e)
+  		jet2 = TLorentzVector()
+  		jet2.SetPtEtaPhiE(chain.jet2_pt, chain.jet2_eta, chain.jet2_phi, chain.jet2_e)
+  		jet12 = jet1 +jet2
   
-  	# Fill the histograms
-  	h1d_mjj.Fill(jet12.M())
-  	h1d_pt1.Fill(chain.jet1_pt)
-  	h1d_pt2.Fill(chain.jet2_pt)
-  	h1d_eta1.Fill(chain.jet1_eta)
-  	h1d_eta2.Fill(chain.jet2_eta)
+  		# Fill the histograms
+  		h1d_mjj.Fill(jet12.M())
+  		h1d_pt1.Fill(chain.jet1_pt)
+  		h1d_pt2.Fill(chain.jet2_pt)
+  		h1d_eta1.Fill(chain.jet1_eta)
+  		h1d_eta2.Fill(chain.jet2_eta)
   	
-  	dr = jet1.DeltaR(jet2)
-  	h1d_delR.Fill(dr)
+  		dr = jet1.DeltaR(jet2)
+  		h1d_delR.Fill(dr)
   
-  	#chi = np.exp(2*(np.absolute(jet1_eta-jet2_eta))
-  	h1d_chi.Fill( np.exp(2*(np.absolute(chain.jet1_eta-chain.jet2_eta)) )  )
-    	h1d_deleta.Fill( np.absolute(chain.jet1_eta-chain.jet2_eta))
-    	h1d_ht.Fill(chain.Ht)
+  		h1d_chi.Fill( np.exp(2*(np.absolute(chain.jet1_eta-chain.jet2_eta)) )  )
+	    	h1d_deleta.Fill(chain.jet1_eta-chain.jet2_eta)
+    		h1d_ht.Fill(chain.Ht)
 
-h1d_mjj.SetTitle("dijet mass distribution")
-h1d_mjj.GetXaxis().SetTitle("mjj (GeV)")
-h1d_mjj.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_mjj.Integral()  # normalizing histogram
-#h1d_mjj.SetLineColor(ROOT.kBlack+3);
-h1d_mjj.SetFillColor(1)
-h1d_mjj.Scale(scale)
+	hist = [h1d_mjj, h1d_chi, h1d_delR, h1d_pt1, h1d_pt2, h1d_eta1, h1d_eta2, h1d_deleta, h1d_ht]
+	title = ["dijet mass distribution","angular variable distribution","angular seperation","Lead pt distribution","Sublead pt distribution",
+	"Rapitity distribution","Rapitity distribution 2", "rapidity difference", "Jet Pt sum"]
+	x_title = ["mjj (GeV)","chi",'del_R',"pt(GeV)","pt(GeV)","eta","eta","eta1-eta2","Ht (GeV)"]
 
-h1d_chi.SetTitle("angular variable distribution")
-h1d_chi.GetXaxis().SetTitle("chi")
-h1d_chi.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_chi.Integral()  # normalizing histogram
-h1d_chi.SetLineColor(1);
-h1d_chi.Scale(scale)
+	color = [color]
+	Line_color = color * 9
 
-h1d_delR.SetTitle("angular seperation")
-h1d_delR.GetXaxis().SetTitle("del_R")
-h1d_delR.GetYaxis().SetTitle(" # of events")
-scale = expected_Nevets/h1d_delR.Integral()  # normalizing histogram
-h1d_delR.SetLineColor(1);
-h1d_delR.Scale(scale)
+	f = TFile(output, "recreate")
 
-# pt plot
-h1d_pt1.SetTitle("pt distribution")
-h1d_pt1.GetXaxis().SetTitle("pt (GeV)")
-h1d_pt1.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_pt1.Integral()  # normalizing histogram
-h1d_pt1.SetLineColor(1);
-h1d_pt1.Scale(scale)
-
-h1d_pt2.SetTitle("angular variable distribution")
-h1d_pt2.GetXaxis().SetTitle("chi")
-h1d_pt2.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_pt2.Integral()  # normalizing histogram
-h1d_pt2.SetLineColor(7);
-h1d_pt2.Scale(scale)
-
-c1 = TCanvas( 'c1', 'pt', 600, 400 )
-h1d_pt1.Draw("C")
-h1d_pt2.Draw("same")
-c1.Update()
-#c1.SaveAs("pt.png")
-
-h1d_eta1.SetTitle("rapitity distribution")
-h1d_eta1.GetXaxis().SetTitle("eta")
-h1d_eta1.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_eta1.Integral()  # normalizing histogram
-h1d_eta1.SetLineColor(1);
-h1d_eta1.Scale(scale)
-
-h1d_eta2.SetTitle("rapitity distribution")
-h1d_eta2.GetXaxis().SetTitle("eta")
-h1d_eta2.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_eta2.Integral()  # normalizing histogram
-h1d_eta2.SetLineColor(7);
-h1d_eta2.Scale(scale)
-
-h1d_deleta.SetTitle("rapitity difference")
-h1d_deleta.GetXaxis().SetTitle("eta1-eta2")
-h1d_deleta.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_deleta.Integral()  # normalizing histogram
-h1d_deleta.SetLineColor(7);
-h1d_deleta.Scale(scale)
-
-h1d_ht.SetTitle("Jet Pt sum")
-h1d_ht.GetXaxis().SetTitle("eta")
-h1d_ht.GetYaxis().SetTitle("# of events")
-scale = expected_Nevets/h1d_ht.Integral()  # normalizing histogram
-h1d_ht.SetLineColor(7);
-h1d_ht.Scale(scale)
+	for i in range(9):
+		hist[i].SetTitle(title[i])
+		hist[i].GetXaxis().SetTitle(x_title[i])
+		hist[i].GetYaxis().SetTitle('# of events')
+		scale = expected_Nevets/hist[i].Integral()
+		hist[i].SetLineColor(Line_color[i])
+		hist[i].Scale(scale)
+		hist[i].Write()
+	print "finished processing the sample"
+	print ""
 
 
-
-c2 = TCanvas( "c2","eta", 600, 400 )
-h1d_eta1.Draw()
-h1d_eta2.Draw("same")
-c2.Update()
+hist (chunkdirectoty_0_500,1,"hist_HT_0_500.root",expected_Nevets_3ab_0_500)
+hist (chunkdirectoty_500_1000,3,"hist_HT_500_1000.root",expected_Nevets_3ab_500_1000)
+hist (chunkdirectoty_1000_2000,7,"hist_HT_1000_2000.root",expected_Nevets_3ab_1000_2000)
 
 
-# write resulting histogram objects into a root file
-f = TFile("hist_HT_0500.root", "recreate")
-h1d_mjj.Write()
-#h1d_pt1.Write()
-#h1d_pt2.Write()
-#h1d_eta1.Write()
-h1d_delR.Write()
-h1d_chi.Write()
-c1.Write()
-c2.Write()
